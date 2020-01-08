@@ -9,6 +9,7 @@ public class TrelloConstants {
     public static final String ROOT_PATH = "https://api.trello.com/1";
     public static final String MEMBERS_PATH = "/members/";
     public static final String BOARDS_PATH = "/boards/";
-    public static final String CONST_ID = "xwV5wRjG";
+    public static final String TEST_USERNAME = "valbod";
+    public static final String TEST_BOARD_SHORT_LINK = "vh2HzNEO";
 
 }

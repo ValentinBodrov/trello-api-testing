@@ -1,5 +1,6 @@
 package api;
 
+import beans.Board;
 import beans.Member;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -14,6 +15,7 @@ import org.apache.http.HttpStatus;
 import utils.ApiPropertiesSingleton;
 
 import java.util.HashMap;
+import java.util.List;
 
 import static constants.TrelloConstants.*;
 import static io.restassured.http.ContentType.JSON;
@@ -41,6 +43,15 @@ public class MemberApi {
                     .log().all()
                     .get(ROOT_PATH + MEMBERS_PATH + username).prettyPeek();
         }
+
+        public Response getMemberBoards(String username) {
+            return RestAssured
+                    .given(requestSpecification())
+                    .with()
+                    .log().all()
+                    .get(ROOT_PATH + MEMBERS_PATH + username + BOARDS_PATH)
+                    .prettyPeek();
+        }
     }
 
     public static ApiBuilder with() {
@@ -53,6 +64,14 @@ public class MemberApi {
                 fromJson(response.asString().
                                 trim(),
                         new TypeToken<Member>() {
+                        }.getType());
+    }
+
+    public static List<Board> getMemberBoards(Response response) {
+        return new Gson().
+                fromJson(response.asString().
+                                trim(),
+                        new TypeToken<List<Board>>() {
                         }.getType());
     }
 

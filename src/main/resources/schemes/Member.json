@@ -10,9 +10,7 @@
   "status": "disconnected",
   "url": "https://trello.com/taco",
   "username": "taco",
-  "avatarSource": null,
   "email": null,
-  "gravatarHash": null,
   "idBoards": [
     "5824e427857eea92ad0a93fc",
     "58f7becd7a76210902b2f846",
@@ -23,11 +21,5 @@
     "58fa50037361735963976675",
     "592db6c67e4c126659137b88",
     "592f28ad8271344b504b016d"
-  ],
-  "idEnterprise": null,
-  "loginTypes": null,
-  "oneTimeMessagesDismissed": null,
-  "prefs": null,
-  "uploadedAvatarHash": null,
-  "idBoardsPinned": null
+  ]
 }

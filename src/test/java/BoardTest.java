@@ -4,18 +4,22 @@ import beans.Board;
 import beans.Member;
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static api.BoardApi.notFoundSpecification;
 import static api.BoardApi.successSpecification;
-import static constants.TrelloConstants.CONST_ID;
+import static constants.TrelloConstants.TEST_BOARD_SHORT_LINK;
+import static constants.TrelloConstants.TEST_USERNAME;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 
 public class BoardTest {
 
     @Test
     public void simpleGetBoardTest() {
         Board answer =
-                BoardApi.getBoard(BoardApi.with().getBoard(CONST_ID));
+                BoardApi.getBoard(BoardApi.with().getBoard(TEST_BOARD_SHORT_LINK));
         assertThat(answer.name, equalTo("TestBoard"));
     }
 
@@ -73,8 +77,47 @@ public class BoardTest {
         Member member = MemberApi.getMember(
                 MemberApi
                         .with()
-                        .getMember("valbod")
+                        .getMember(TEST_USERNAME)
         );
-        assertThat(member.username, equalTo("valbod"));
+        assertThat(member.username, equalTo(TEST_USERNAME));
     }
+
+    @Test
+    public void simpleGetMemberBoardsTest() {
+        List<Board> boards = MemberApi.getMemberBoards(
+                MemberApi
+                        .with()
+                        .getMemberBoards(TEST_USERNAME)
+        );
+        List<String> boardsIds = new ArrayList<>();
+        for (Board board : boards) {
+            boardsIds.add(board.shortLink);
+        }
+        assertThat(boardsIds, hasItem(TEST_BOARD_SHORT_LINK));
+    }
+
+    @Test
+    public void simpleDeleteAllBoardsExceptTestBoard() {
+        List<Board> boards = MemberApi.getMemberBoards(
+                MemberApi
+                        .with()
+                        .getMemberBoards(TEST_USERNAME)
+        );
+        List<String> boardsShortLinks = new ArrayList<>();
+        for (Board board : boards) {
+            boardsShortLinks.add(board.shortLink);
+        }
+        for (int i = 0; i < boards.size(); i++) {
+            if (!boardsShortLinks.get(i).equals(TEST_BOARD_SHORT_LINK)) {
+                BoardApi
+                        .with()
+                        .deleteBoard(boards.get(i).id)
+                        .then()
+                        .specification(successSpecification());
+                boardsShortLinks.remove(i);
+            }
+        }
+        assertThat(boardsShortLinks, hasSize(1));
+    }
+
 }
