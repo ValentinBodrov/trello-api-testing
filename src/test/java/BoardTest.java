@@ -1,10 +1,11 @@
 import api.BoardApi;
+import api.MemberApi;
 import beans.Board;
-import io.restassured.RestAssured;
-import org.apache.http.HttpStatus;
+import beans.Member;
 import org.testng.annotations.Test;
 
-import static api.BoardApi.responseSpecification;
+import static api.BoardApi.notFoundSpecification;
+import static api.BoardApi.successSpecification;
 import static constants.TrelloConstants.CONST_ID;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -12,26 +13,26 @@ import static org.hamcrest.Matchers.equalTo;
 public class BoardTest {
 
     @Test
-    public void getBoardTest() {
-        Board answers =
+    public void simpleGetBoardTest() {
+        Board answer =
                 BoardApi.getBoard(BoardApi.with().getBoard(CONST_ID));
-        assertThat(answers.name, equalTo("TestBoard"));
+        assertThat(answer.name, equalTo("TestBoard"));
     }
 
     @Test
-    public void createBoardTest() {
-        Board answers = BoardApi.getBoard(
+    public void simpleCreateBoardTest() {
+        Board answer = BoardApi.getBoard(
                 BoardApi.
                         with().
                         name("newBoard").
                         desc("simple desc").
                         createBoard());
-        assertThat(answers.name, equalTo("newBoard"));
+        assertThat(answer.name, equalTo("newBoard"));
     }
 
     @Test
-    public void deleteBoardTest() {
-        Board answers = BoardApi.getBoard(
+    public void simpleDeleteBoardTest() {
+        Board answer = BoardApi.getBoard(
                 BoardApi.
                         with().
                         name("newBoard").
@@ -39,13 +40,41 @@ public class BoardTest {
                         createBoard());
         BoardApi
                 .with()
-                .deleteBoard(answers.id);
-        BoardApi
-                .with()
-                .getBoard(answers.id)
+                .deleteBoard(answer.id)
                 .then()
-                .assertThat()
-                .statusCode(HttpStatus.SC_NOT_FOUND);
+                .specification(successSpecification());
+        BoardApi
+                .with()
+                .getBoard(answer.id)
+                .then()
+                .specification(notFoundSpecification());
     }
 
+    @Test
+    public void simpleUpdateBoardTest() {
+        Board answer = BoardApi.getBoard(
+                BoardApi
+                        .with()
+                        .name("newBoard")
+                        .desc("simple desc")
+                        .createBoard()
+        );
+        answer = BoardApi.getBoard(
+                BoardApi
+                        .with()
+                        .name("anotherNewBoard")
+                        .updateBoard(answer.id)
+        );
+        assertThat(answer.name, equalTo("anotherNewBoard"));
+    }
+
+    @Test
+    public void simpleGetMemberTest() {
+        Member member = MemberApi.getMember(
+                MemberApi
+                        .with()
+                        .getMember("valbod")
+        );
+        assertThat(member.username, equalTo("valbod"));
+    }
 }

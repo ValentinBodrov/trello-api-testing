@@ -1,12 +1,11 @@
 package api;
 
-import beans.Board;
+import beans.Member;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
-import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
@@ -21,77 +20,39 @@ import static io.restassured.http.ContentType.JSON;
 import static io.restassured.http.ContentType.TEXT;
 import static org.hamcrest.Matchers.lessThan;
 
-public class BoardApi {
+public class MemberApi {
 
-    private BoardApi() {
+    private MemberApi() {
     }
 
     private HashMap<String, String> params = new HashMap<String, String>();
-    private Method method = Method.GET;
 
     public static class ApiBuilder {
-        BoardApi trelloApi;
+        MemberApi trelloApi;
 
-        private ApiBuilder(BoardApi boardApi) {
-            this.trelloApi = boardApi;
+        private ApiBuilder(MemberApi memberApi) {
+            this.trelloApi = memberApi;
         }
 
-        public ApiBuilder name(String name) {
-            trelloApi.params.put("name", name);
-            return this;
-        }
-
-        public ApiBuilder desc(String desc) {
-            trelloApi.params.put("desc", desc);
-            return this;
-        }
-
-        public Response getBoard(String id) {
+        public Response getMember(String username) {
             return RestAssured
                     .given(requestSpecification())
                     .with()
                     .log().all()
-                    .get(ROOT_PATH + BOARDS_PATH + id).prettyPeek();
+                    .get(ROOT_PATH + MEMBERS_PATH + username).prettyPeek();
         }
-
-        public Response createBoard() {
-            return RestAssured
-                    .given(requestSpecification())
-                    .with()
-                    .queryParams(trelloApi.params)
-                    .log().all()
-                    .post(ROOT_PATH + BOARDS_PATH).prettyPeek();
-        }
-
-        public Response deleteBoard(String id) {
-            return RestAssured
-                    .given(requestSpecification())
-                    .with()
-                    .log().all()
-                    .delete(ROOT_PATH + BOARDS_PATH + id).prettyPeek();
-        }
-
-        public Response updateBoard(String id) {
-            return RestAssured
-                    .given(requestSpecification())
-                    .with()
-                    .queryParams(trelloApi.params)
-                    .log().all()
-                    .put(ROOT_PATH + BOARDS_PATH + id).prettyPeek();
-        }
-
     }
 
     public static ApiBuilder with() {
-        BoardApi api = new BoardApi();
+        MemberApi api = new MemberApi();
         return new ApiBuilder(api);
     }
 
-    public static Board getBoard(Response response) {
+    public static Member getMember(Response response) {
         return new Gson().
                 fromJson(response.asString().
                                 trim(),
-                        new TypeToken<Board>() {
+                        new TypeToken<Member>() {
                         }.getType());
     }
 
