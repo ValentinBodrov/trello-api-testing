@@ -6,7 +6,6 @@ import com.google.gson.reflect.TypeToken;
 import io.restassured.RestAssured;
 import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.builder.ResponseSpecBuilder;
-import io.restassured.http.Method;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
@@ -23,11 +22,11 @@ import static org.hamcrest.Matchers.lessThan;
 
 public class BoardApi {
 
+    // Builder-pattern for manipulations with boards
     private BoardApi() {
     }
 
-    private HashMap<String, String> params = new HashMap<String, String>();
-    private Method method = Method.GET;
+    private HashMap<String, String> params = new HashMap<>();
 
     public static class ApiBuilder {
         BoardApi trelloApi;
@@ -36,16 +35,19 @@ public class BoardApi {
             this.trelloApi = boardApi;
         }
 
+        // Use it for adding name in request
         public ApiBuilder name(String name) {
             trelloApi.params.put("name", name);
             return this;
         }
 
+        // Use it for adding description in request
         public ApiBuilder desc(String desc) {
             trelloApi.params.put("desc", desc);
             return this;
         }
 
+        // GET-request for board
         public Response getBoard(String id) {
             return RestAssured
                     .given(requestSpecification())
@@ -54,6 +56,7 @@ public class BoardApi {
                     .get(ROOT_PATH + BOARDS_PATH + id).prettyPeek();
         }
 
+        // POST-request for board
         public Response createBoard() {
             return RestAssured
                     .given(requestSpecification())
@@ -63,6 +66,7 @@ public class BoardApi {
                     .post(ROOT_PATH + BOARDS_PATH).prettyPeek();
         }
 
+        // DELETE-request for board
         public Response deleteBoard(String id) {
             return RestAssured
                     .given(requestSpecification())
@@ -71,6 +75,7 @@ public class BoardApi {
                     .delete(ROOT_PATH + BOARDS_PATH + id).prettyPeek();
         }
 
+        // PUT-request for board
         public Response updateBoard(String id) {
             return RestAssured
                     .given(requestSpecification())
@@ -82,11 +87,13 @@ public class BoardApi {
 
     }
 
+    // Use it for starting building the query
     public static ApiBuilder with() {
         BoardApi api = new BoardApi();
         return new ApiBuilder(api);
     }
 
+    // Use it for getting a board-object
     public static Board getBoard(Response response) {
         return new Gson().
                 fromJson(response.asString().
@@ -95,6 +102,7 @@ public class BoardApi {
                         }.getType());
     }
 
+    // A specification for successful response (OK status code)
     public static ResponseSpecification successSpecification() {
         return new ResponseSpecBuilder()
                 .expectContentType(JSON)
@@ -104,6 +112,7 @@ public class BoardApi {
                 .build();
     }
 
+    // A specification for response which has NOT_FOUND status code
     public static ResponseSpecification notFoundSpecification() {
         return new ResponseSpecBuilder()
                 .expectContentType(TEXT)
@@ -113,7 +122,8 @@ public class BoardApi {
                 .build();
     }
 
-    public static RequestSpecification requestSpecification() {
+    // A specification for setting parameters in request
+    private static RequestSpecification requestSpecification() {
         return new RequestSpecBuilder()
                 .setContentType(JSON)
                 .setAccept(JSON)

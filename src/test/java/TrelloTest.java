@@ -2,41 +2,48 @@ import api.BoardApi;
 import api.MemberApi;
 import beans.Board;
 import beans.Member;
+import org.testng.annotations.AfterSuite;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import static api.BoardApi.notFoundSpecification;
 import static api.BoardApi.successSpecification;
-import static constants.TrelloConstants.TEST_BOARD_SHORT_LINK;
-import static constants.TrelloConstants.TEST_USERNAME;
+import static constants.TrelloConstants.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-public class BoardTest {
+public class TrelloTest {
 
+    // This is a simple test for getting test board
     @Test
     public void simpleGetBoardTest() {
-        Board answer =
+        Board board =
                 BoardApi.getBoard(BoardApi.with().getBoard(TEST_BOARD_SHORT_LINK));
-        assertThat(answer.name, equalTo("TestBoard"));
+        assertThat(board.name, equalTo("TestBoard"));
     }
 
+    // This is a simple test for creating a board
     @Test
     public void simpleCreateBoardTest() {
-        Board answer = BoardApi.getBoard(
-                BoardApi.
-                        with().
-                        name("newBoard").
-                        desc("simple desc").
-                        createBoard());
-        assertThat(answer.name, equalTo("newBoard"));
+        Board board = BoardApi.getBoard(
+                BoardApi
+                        .with()
+                        .name("newBoard")
+                        .desc("simple desc")
+                        .createBoard());
+        assertThat(board.name, equalTo("newBoard"));
+        assertThat(board.desc, equalTo("simple desc"));
     }
 
+    // This is a simple test for deleting a board
+    // NB! The test passed when the created board cannot
+    // be found in answer
     @Test
     public void simpleDeleteBoardTest() {
-        Board answer = BoardApi.getBoard(
+        Board board = BoardApi.getBoard(
                 BoardApi.
                         with().
                         name("newBoard").
@@ -44,34 +51,38 @@ public class BoardTest {
                         createBoard());
         BoardApi
                 .with()
-                .deleteBoard(answer.id)
+                .deleteBoard(board.id)
                 .then()
                 .specification(successSpecification());
         BoardApi
                 .with()
-                .getBoard(answer.id)
+                .getBoard(board.id)
                 .then()
                 .specification(notFoundSpecification());
     }
 
+    // This is a simple test for updating a board
+    // There's a created board with name 'newBoard',
+    // and the query replaced its name on 'anotherNewBoard'
     @Test
     public void simpleUpdateBoardTest() {
-        Board answer = BoardApi.getBoard(
+        Board board = BoardApi.getBoard(
                 BoardApi
                         .with()
                         .name("newBoard")
                         .desc("simple desc")
                         .createBoard()
         );
-        answer = BoardApi.getBoard(
+        board = BoardApi.getBoard(
                 BoardApi
                         .with()
                         .name("anotherNewBoard")
-                        .updateBoard(answer.id)
+                        .updateBoard(board.id)
         );
-        assertThat(answer.name, equalTo("anotherNewBoard"));
+        assertThat(board.name, equalTo("anotherNewBoard"));
     }
 
+    // This is a simple test for getting a test member
     @Test
     public void simpleGetMemberTest() {
         Member member = MemberApi.getMember(
@@ -80,8 +91,10 @@ public class BoardTest {
                         .getMember(TEST_USERNAME)
         );
         assertThat(member.username, equalTo(TEST_USERNAME));
+        assertThat(member.initials, equalTo(TEST_INITIALS));
     }
 
+    // This is a simple test for getting all test member'sboard
     @Test
     public void simpleGetMemberBoardsTest() {
         List<Board> boards = MemberApi.getMemberBoards(
@@ -96,8 +109,9 @@ public class BoardTest {
         assertThat(boardsIds, hasItem(TEST_BOARD_SHORT_LINK));
     }
 
-    @Test
-    public void simpleDeleteAllBoardsExceptTestBoard() {
+    // It will be used for cleaning all unnecessary boards
+    @AfterSuite
+    public void tearDown() {
         List<Board> boards = MemberApi.getMemberBoards(
                 MemberApi
                         .with()
@@ -107,17 +121,18 @@ public class BoardTest {
         for (Board board : boards) {
             boardsShortLinks.add(board.shortLink);
         }
-        for (int i = 0; i < boards.size(); i++) {
-            if (!boardsShortLinks.get(i).equals(TEST_BOARD_SHORT_LINK)) {
+        Iterator iterator = boardsShortLinks.iterator();
+        for (Board board : boards) {
+            String boardShortLink = iterator.next().toString();
+            if (!boardShortLink.equals(TEST_BOARD_SHORT_LINK)) {
                 BoardApi
                         .with()
-                        .deleteBoard(boards.get(i).id)
+                        .deleteBoard(board.id)
                         .then()
                         .specification(successSpecification());
-                boardsShortLinks.remove(i);
+                iterator.remove();
             }
         }
         assertThat(boardsShortLinks, hasSize(1));
     }
-
 }

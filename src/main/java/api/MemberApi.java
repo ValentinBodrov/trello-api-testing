@@ -14,7 +14,6 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import utils.ApiPropertiesSingleton;
 
-import java.util.HashMap;
 import java.util.List;
 
 import static constants.TrelloConstants.*;
@@ -24,10 +23,9 @@ import static org.hamcrest.Matchers.lessThan;
 
 public class MemberApi {
 
+    // Builder-pattern for manipulations with members
     private MemberApi() {
     }
-
-    private HashMap<String, String> params = new HashMap<String, String>();
 
     public static class ApiBuilder {
         MemberApi trelloApi;
@@ -36,6 +34,7 @@ public class MemberApi {
             this.trelloApi = memberApi;
         }
 
+        // GET-request for member
         public Response getMember(String username) {
             return RestAssured
                     .given(requestSpecification())
@@ -44,6 +43,7 @@ public class MemberApi {
                     .get(ROOT_PATH + MEMBERS_PATH + username).prettyPeek();
         }
 
+        // GET-request for member's boards
         public Response getMemberBoards(String username) {
             return RestAssured
                     .given(requestSpecification())
@@ -54,11 +54,13 @@ public class MemberApi {
         }
     }
 
+    // Use it for starting building the query
     public static ApiBuilder with() {
         MemberApi api = new MemberApi();
         return new ApiBuilder(api);
     }
 
+    // Use it for getting a member-object
     public static Member getMember(Response response) {
         return new Gson().
                 fromJson(response.asString().
@@ -67,6 +69,7 @@ public class MemberApi {
                         }.getType());
     }
 
+    // Use it for getting a list of member's boards
     public static List<Board> getMemberBoards(Response response) {
         return new Gson().
                 fromJson(response.asString().
@@ -75,6 +78,7 @@ public class MemberApi {
                         }.getType());
     }
 
+    // A specification for successful response (OK status code)
     public static ResponseSpecification successSpecification() {
         return new ResponseSpecBuilder()
                 .expectContentType(JSON)
@@ -84,16 +88,8 @@ public class MemberApi {
                 .build();
     }
 
-    public static ResponseSpecification notFoundSpecification() {
-        return new ResponseSpecBuilder()
-                .expectContentType(TEXT)
-                .expectHeader(HttpHeaders.CONNECTION, "keep-alive")
-                .expectResponseTime(lessThan(2000L))
-                .expectStatusCode(HttpStatus.SC_NOT_FOUND)
-                .build();
-    }
-
-    public static RequestSpecification requestSpecification() {
+    // A specification for setting parameters in request
+    private static RequestSpecification requestSpecification() {
         return new RequestSpecBuilder()
                 .setContentType(JSON)
                 .setAccept(JSON)

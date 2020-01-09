@@ -10,6 +10,7 @@ public class TrelloConstants {
     public static final String MEMBERS_PATH = "/members/";
     public static final String BOARDS_PATH = "/boards/";
     public static final String TEST_USERNAME = "valbod";
+    public static final String TEST_INITIALS = "V";
     public static final String TEST_BOARD_SHORT_LINK = "vh2HzNEO";
 
 }

@@ -1,0 +1,19 @@
+<!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
+<suite name="Test Some Trello API Methods">
+
+    <test name="Trello Tests">
+        <classes>
+            <class name="TrelloTest">
+                <methods>
+                    <include name="simpleGetBoardTest"/>
+                    <include name="simpleCreateBoardTest"/>
+                    <include name="simpleDeleteBoardTest"/>
+                    <include name="simpleUpdateBoardTest"/>
+                    <include name="simpleGetMemberTest"/>
+                    <include name="simpleGetMemberBoardsTest"/>
+                </methods>
+            </class>
+        </classes>
+    </test>
+
+</suite>

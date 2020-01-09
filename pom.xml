@@ -28,6 +28,21 @@
 
     </properties>
 
+    <profiles>
+
+        <profile>
+            <id>TrelloScenario</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <suite.file>src/test/resources/testng.xml
+                </suite.file>
+            </properties>
+        </profile>
+
+    </profiles>
+
     <dependencies>
 
         <dependency>
