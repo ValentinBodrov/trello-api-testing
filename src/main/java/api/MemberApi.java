@@ -14,17 +14,25 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import utils.ApiPropertiesSingleton;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import static api.ServiceSpecification.baseResponseSpecification;
 import static constants.TrelloConstants.*;
 import static io.restassured.http.ContentType.JSON;
-import static io.restassured.http.ContentType.TEXT;
 import static org.hamcrest.Matchers.lessThan;
 
 public class MemberApi {
 
-    // Builder-pattern for manipulations with members
     private MemberApi() {
+    }
+
+    public static List<String> getAllBoardIds(List<Board> boards) {
+        List<String> boardsIds = new ArrayList<>();
+        for (Board board : boards) {
+            boardsIds.add(board.shortLink);
+        }
+        return boardsIds;
     }
 
     public static class ApiBuilder {
@@ -34,7 +42,6 @@ public class MemberApi {
             this.trelloApi = memberApi;
         }
 
-        // GET-request for member
         public Response getMember(String username) {
             return RestAssured
                     .given(requestSpecification())
@@ -43,7 +50,6 @@ public class MemberApi {
                     .get(ROOT_PATH + MEMBERS_PATH + username).prettyPeek();
         }
 
-        // GET-request for member's boards
         public Response getMemberBoards(String username) {
             return RestAssured
                     .given(requestSpecification())
@@ -54,41 +60,34 @@ public class MemberApi {
         }
     }
 
-    // Use it for starting building the query
-    public static ApiBuilder with() {
+    public static Member getMember(String username) {
         MemberApi api = new MemberApi();
-        return new ApiBuilder(api);
-    }
-
-    // Use it for getting a member-object
-    public static Member getMember(Response response) {
+        ApiBuilder apiBuilder = new ApiBuilder(api);
         return new Gson().
-                fromJson(response.asString().
-                                trim(),
-                        new TypeToken<Member>() {
-                        }.getType());
+                fromJson(apiBuilder.
+                        getMember(username).
+                        asString().
+                        trim(), new TypeToken<Member>() {}.getType());
     }
 
-    // Use it for getting a list of member's boards
-    public static List<Board> getMemberBoards(Response response) {
+    public static List<Board> getMemberBoards(String username) {
+        MemberApi api = new MemberApi();
+        ApiBuilder apiBuilder = new ApiBuilder(api);
         return new Gson().
-                fromJson(response.asString().
-                                trim(),
-                        new TypeToken<List<Board>>() {
-                        }.getType());
+                fromJson(apiBuilder.
+                        getMemberBoards(username).
+                        asString().
+                        trim(), new TypeToken<List<Board>>() {}.getType());
     }
 
-    // A specification for successful response (OK status code)
     public static ResponseSpecification successSpecification() {
         return new ResponseSpecBuilder()
+                .addResponseSpecification(baseResponseSpecification())
                 .expectContentType(JSON)
-                .expectHeader(HttpHeaders.CONNECTION, "keep-alive")
-                .expectResponseTime(lessThan(2000L))
                 .expectStatusCode(HttpStatus.SC_OK)
                 .build();
     }
 
-    // A specification for setting parameters in request
     private static RequestSpecification requestSpecification() {
         return new RequestSpecBuilder()
                 .setContentType(JSON)

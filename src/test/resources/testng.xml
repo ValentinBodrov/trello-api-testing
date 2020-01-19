@@ -3,16 +3,8 @@
 
     <test name="Trello Tests">
         <classes>
-            <class name="TrelloTest">
-                <methods>
-                    <include name="simpleGetBoardTest"/>
-                    <include name="simpleCreateBoardTest"/>
-                    <include name="simpleDeleteBoardTest"/>
-                    <include name="simpleUpdateBoardTest"/>
-                    <include name="simpleGetMemberTest"/>
-                    <include name="simpleGetMemberBoardsTest"/>
-                </methods>
-            </class>
+            <class name="BoardTest"/>
+            <class name="MemberTest"/>
         </classes>
     </test>
 

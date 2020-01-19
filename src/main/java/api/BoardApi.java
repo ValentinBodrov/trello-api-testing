@@ -15,14 +15,13 @@ import utils.ApiPropertiesSingleton;
 
 import java.util.HashMap;
 
+import static api.ServiceSpecification.baseResponseSpecification;
 import static constants.TrelloConstants.*;
 import static io.restassured.http.ContentType.JSON;
 import static io.restassured.http.ContentType.TEXT;
-import static org.hamcrest.Matchers.lessThan;
 
 public class BoardApi {
 
-    // Builder-pattern for manipulations with boards
     private BoardApi() {
     }
 
@@ -35,19 +34,11 @@ public class BoardApi {
             this.trelloApi = boardApi;
         }
 
-        // Use it for adding name in request
         public ApiBuilder name(String name) {
             trelloApi.params.put("name", name);
             return this;
         }
 
-        // Use it for adding description in request
-        public ApiBuilder desc(String desc) {
-            trelloApi.params.put("desc", desc);
-            return this;
-        }
-
-        // GET-request for board
         public Response getBoard(String id) {
             return RestAssured
                     .given(requestSpecification())
@@ -56,7 +47,6 @@ public class BoardApi {
                     .get(ROOT_PATH + BOARDS_PATH + id).prettyPeek();
         }
 
-        // POST-request for board
         public Response createBoard() {
             return RestAssured
                     .given(requestSpecification())
@@ -66,7 +56,6 @@ public class BoardApi {
                     .post(ROOT_PATH + BOARDS_PATH).prettyPeek();
         }
 
-        // DELETE-request for board
         public Response deleteBoard(String id) {
             return RestAssured
                     .given(requestSpecification())
@@ -75,7 +64,6 @@ public class BoardApi {
                     .delete(ROOT_PATH + BOARDS_PATH + id).prettyPeek();
         }
 
-        // PUT-request for board
         public Response updateBoard(String id) {
             return RestAssured
                     .given(requestSpecification())
@@ -87,42 +75,67 @@ public class BoardApi {
 
     }
 
-    // Use it for starting building the query
     public static ApiBuilder with() {
         BoardApi api = new BoardApi();
         return new ApiBuilder(api);
     }
 
-    // Use it for getting a board-object
-    public static Board getBoard(Response response) {
+    public static Board getBoard(String id) {
+        BoardApi api = new BoardApi();
+        ApiBuilder apiBuilder = new ApiBuilder(api);
         return new Gson().
-                fromJson(response.asString().
-                                trim(),
-                        new TypeToken<Board>() {
-                        }.getType());
+                fromJson(apiBuilder.
+                        getBoard(id).
+                        asString().
+                        trim(), new TypeToken<Board>() {}.getType());
     }
 
-    // A specification for successful response (OK status code)
+    public static Board createBoard(String name) {
+        BoardApi api = new BoardApi();
+        ApiBuilder apiBuilder = new ApiBuilder(api);
+        apiBuilder.name(name);
+        return new Gson().
+                fromJson(apiBuilder.
+                        createBoard().
+                        asString().
+                        trim(), new TypeToken<Board>() {}.getType());
+    }
+
+    public static Board updateBoard(String id, String newName) {
+        BoardApi api = new BoardApi();
+        ApiBuilder apiBuilder = new ApiBuilder(api);
+        apiBuilder.name(newName);
+        return new Gson().
+                fromJson(apiBuilder.
+                        updateBoard(id).
+                        asString().
+                        trim(), new TypeToken<Board>() {}.getType());
+    }
+
+    public static void deleteBoard(String id) {
+        BoardApi api = new BoardApi();
+        ApiBuilder apiBuilder = new ApiBuilder(api);
+        new Gson().fromJson(
+                apiBuilder.deleteBoard(id).asString().trim(),
+                new TypeToken<Board>() {}.getType());
+    }
+
     public static ResponseSpecification successSpecification() {
         return new ResponseSpecBuilder()
+                .addResponseSpecification(baseResponseSpecification())
                 .expectContentType(JSON)
-                .expectHeader(HttpHeaders.CONNECTION, "keep-alive")
-                .expectResponseTime(lessThan(2000L))
                 .expectStatusCode(HttpStatus.SC_OK)
                 .build();
     }
 
-    // A specification for response which has NOT_FOUND status code
     public static ResponseSpecification notFoundSpecification() {
         return new ResponseSpecBuilder()
+                .addResponseSpecification(baseResponseSpecification())
                 .expectContentType(TEXT)
-                .expectHeader(HttpHeaders.CONNECTION, "keep-alive")
-                .expectResponseTime(lessThan(2000L))
                 .expectStatusCode(HttpStatus.SC_NOT_FOUND)
                 .build();
     }
 
-    // A specification for setting parameters in request
     private static RequestSpecification requestSpecification() {
         return new RequestSpecBuilder()
                 .setContentType(JSON)

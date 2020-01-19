@@ -2,10 +2,7 @@
   "id": "5612e4f91b25c15e873722b8",
   "name": "Employee Manual",
   "desc": "",
-  "descData": null,
   "closed": false,
-  "idOrganization": "54b58957112602c9a0be7aa3",
-  "invited": false,
   "memberships": [
     {
       "id": "5612e4fb1b25c15e8737234b",
@@ -20,40 +17,7 @@
       "unconfirmed": false
     }
   ],
-  "pinned": false,
-  "starred": false,
   "url": "https://trello.com/b/HbTEX5hb/employee-manual",
-  "prefs": {
-    "permissionLevel": "public",
-    "voting": "disabled",
-    "comments": "members",
-    "invitations": "members",
-    "selfJoin": true,
-    "cardCovers": true,
-    "cardAging": "regular",
-    "calendarFeedEnabled": false,
-    "background": "5925b78fa1bd45e1bfb835da",
-    "backgroundImage": "https://trello-backgrounds.s3.amazonaws.com/SharedBackground/2560x1707/f3c8b6101072d80565d9b6368f05b19d/photo-1495571758719-6ec1e876d6ae",
-    "canBePublic": false,
-    "canBeOrg": false,
-    "canBePrivate": false,
-    "canInvite": true
-  },
-  "invitations": [],
   "shortLink": "HbTEX5hb",
-  "labelNames": {
-    "green": "",
-    "yellow": "good to go",
-    "orange": "",
-    "red": "",
-    "purple": "",
-    "blue": "",
-    "sky": "",
-    "lime": "",
-    "pink": "",
-    "black": ""
-  },
-  "shortUrl": "https://trello.com/b/HbTEX5hb",
-  "idTags": [],
-  "datePluginDisable": null
+  "shortUrl": "https://trello.com/b/HbTEX5hb"
 }
