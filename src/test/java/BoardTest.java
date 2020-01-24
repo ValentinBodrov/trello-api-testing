@@ -1,12 +1,9 @@
 import api.BoardApi;
-import api.MemberApi;
 import beans.Board;
-import beans.Member;
 import org.testng.annotations.Test;
-import java.util.List;
 
 import static api.BoardApi.notFoundSpecification;
-import static constants.TrelloConstants.*;
+import static api.ServiceSpecification.generateRandomString;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -14,21 +11,28 @@ public class BoardTest {
 
     @Test
     public void simpleGetBoardTest() {
-        Board board = BoardApi.getBoard(TEST_BOARD_SHORT_LINK);
-        assertThat(board.name, equalTo("TestBoard"));
+        String generatedString = generateRandomString();
+        Board createdBoard = BoardApi.createBoard(generatedString);
+
+        Board board = BoardApi.getBoard(createdBoard.id);
+        assertThat(board.name, equalTo(generatedString));
+
+        BoardApi.deleteBoard(board.id);
     }
 
     @Test
     public void simpleCreateBoardTest() {
-        Board board = BoardApi.createBoard("newBoard");
-        assertThat(board.name, equalTo("newBoard"));
+        String generatedString = generateRandomString();
+        Board board = BoardApi.createBoard(generatedString);
+        assertThat(board.name, equalTo(generatedString));
 
         BoardApi.deleteBoard(board.id);
     }
 
     @Test
     public void simpleDeleteBoardTest() {
-        Board board = BoardApi.createBoard("newBoard");
+        String generatedString = generateRandomString();
+        Board board = BoardApi.createBoard(generatedString);
         BoardApi.deleteBoard(board.id);
 
         BoardApi
@@ -40,24 +44,12 @@ public class BoardTest {
 
     @Test
     public void simpleUpdateBoardTest() {
-        Board board = BoardApi.createBoard("newBoard");
-        board = BoardApi.updateBoard(board.id, "anotherNewBoard");
-        assertThat(board.name, equalTo("anotherNewBoard"));
+        String generatedString = generateRandomString();
+        Board board = BoardApi.createBoard(generatedString);
+        String newGeneratedString = generateRandomString();
+        board = BoardApi.updateBoard(board.id, newGeneratedString);
+        assertThat(board.name, equalTo(newGeneratedString));
 
         BoardApi.deleteBoard(board.id);
-    }
-
-    @Test
-    public void simpleGetMemberTest() {
-        Member member = MemberApi.getMember(TEST_USERNAME);
-        assertThat(member.username, equalTo(TEST_USERNAME));
-        assertThat(member.initials, equalTo(TEST_INITIALS));
-    }
-
-    @Test
-    public void simpleGetMemberBoardsTest() {
-        List<Board> boards = MemberApi.getMemberBoards(TEST_USERNAME);
-        List<String> boardsIds = MemberApi.getAllBoardIds(boards);
-        assertThat(boardsIds, hasItem(TEST_BOARD_SHORT_LINK));
     }
 }

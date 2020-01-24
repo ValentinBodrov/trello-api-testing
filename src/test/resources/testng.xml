@@ -4,7 +4,6 @@
     <test name="Trello Tests">
         <classes>
             <class name="BoardTest"/>
-            <class name="MemberTest"/>
         </classes>
     </test>
 

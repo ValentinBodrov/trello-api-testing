@@ -9,7 +9,6 @@ import io.restassured.builder.ResponseSpecBuilder;
 import io.restassured.response.Response;
 import io.restassured.specification.RequestSpecification;
 import io.restassured.specification.ResponseSpecification;
-import org.apache.http.HttpHeaders;
 import org.apache.http.HttpStatus;
 import utils.ApiPropertiesSingleton;
 
@@ -80,44 +79,37 @@ public class BoardApi {
         return new ApiBuilder(api);
     }
 
+    private static Board getGson(Response response) {
+        return new Gson().
+                fromJson(response.
+                        asString().
+                        trim(), new TypeToken<Board>() {}.getType());
+    }
+
     public static Board getBoard(String id) {
         BoardApi api = new BoardApi();
         ApiBuilder apiBuilder = new ApiBuilder(api);
-        return new Gson().
-                fromJson(apiBuilder.
-                        getBoard(id).
-                        asString().
-                        trim(), new TypeToken<Board>() {}.getType());
+        return getGson(apiBuilder.getBoard(id));
     }
 
     public static Board createBoard(String name) {
         BoardApi api = new BoardApi();
         ApiBuilder apiBuilder = new ApiBuilder(api);
         apiBuilder.name(name);
-        return new Gson().
-                fromJson(apiBuilder.
-                        createBoard().
-                        asString().
-                        trim(), new TypeToken<Board>() {}.getType());
+        return getGson(apiBuilder.createBoard());
     }
 
     public static Board updateBoard(String id, String newName) {
         BoardApi api = new BoardApi();
         ApiBuilder apiBuilder = new ApiBuilder(api);
         apiBuilder.name(newName);
-        return new Gson().
-                fromJson(apiBuilder.
-                        updateBoard(id).
-                        asString().
-                        trim(), new TypeToken<Board>() {}.getType());
+        return getGson(apiBuilder.updateBoard(id));
     }
 
     public static void deleteBoard(String id) {
         BoardApi api = new BoardApi();
         ApiBuilder apiBuilder = new ApiBuilder(api);
-        new Gson().fromJson(
-                apiBuilder.deleteBoard(id).asString().trim(),
-                new TypeToken<Board>() {}.getType());
+        getGson(apiBuilder.deleteBoard(id));
     }
 
     public static ResponseSpecification successSpecification() {
