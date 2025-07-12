@@ -16,7 +16,7 @@
 
         <!-- Libraries version -->
         <testng.version>7.5.1</testng.version>
-        <commons-lang3.version>3.9</commons-lang3.version>
+        <commons-lang3.version>3.18.0</commons-lang3.version>
         <hamcrest-core.version>1.3</hamcrest-core.version>
         <rest-assured.version>3.2.0</rest-assured.version>
         <commons-lang.version>2.6</commons-lang.version>
